@@ -67,7 +67,11 @@ type ProviderMetadataSpec struct {
 	Documentation []Link                `json:"documentation,omitempty"`
 	Icon          *Icon                 `json:"icon,omitempty"`
 
-	Links                    []Link                `json:"links,omitempty"`
+	// Links are provider-owned links. At most one link may be marked as the
+	// main link via `main: true`.
+	// +kubebuilder:validation:XValidation:rule="self.filter(l, has(l.main) && l.main).size() <= 1",message="only one link may be marked as main"
+	Links []Link `json:"links,omitempty"`
+
 	PreferredSupportChannels []Link                `json:"preferredSupportChannels,omitempty"`
 	HelpCenterData           []Link                `json:"helpCenterData,omitempty"`
 	DetailViewExtensions     []DetailViewExtension `json:"detailViewExtensions,omitempty"`

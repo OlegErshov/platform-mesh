@@ -15,7 +15,7 @@
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
-  name: v260915-8d919cc0.providermetadatas.ui.platform-mesh.io
+  name: v260915-b1efd6d3.providermetadatas.ui.platform-mesh.io
 spec:
   group: ui.platform-mesh.io
   names:
@@ -128,6 +128,9 @@ spec:
               - light
               type: object
             links:
+              description: |-
+                Links are provider-owned links. At most one link may be marked as the
+                main link via `main: true`.
               items:
                 properties:
                   displayName:
@@ -138,6 +141,9 @@ spec:
                     type: string
                 type: object
               type: array
+              x-kubernetes-validations:
+              - message: only one link may be marked as main
+                rule: self.filter(l, has(l.main) && l.main).size() <= 1
             preferredSupportChannels:
               items:
                 properties:
