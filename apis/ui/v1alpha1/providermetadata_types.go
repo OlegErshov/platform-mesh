@@ -54,19 +54,6 @@ type DetailViewExtension struct {
 	URL string `json:"url"`
 }
 
-// ServiceLevel describes the support coverage offered by a provider, rendered
-// in the "Service Level" row of the provider details view.
-// +kubebuilder:validation:Enum=veryHigh24x7;high24x5;mediumOne16x5;mediumTwo12x5;low8x5
-type ServiceLevel string
-
-const (
-	ServiceLevelVeryHigh  ServiceLevel = "veryHigh24x7"
-	ServiceLevelHigh      ServiceLevel = "high24x5"
-	ServiceLevelMediumOne ServiceLevel = "mediumOne16x5"
-	ServiceLevelMediumTwo ServiceLevel = "mediumTwo12x5"
-	ServiceLevelLow       ServiceLevel = "low8x5"
-)
-
 // ProviderMetadataSpec defines the desired state of ProviderMetadata.
 type ProviderMetadataSpec struct {
 	Tags []string `json:"tags,omitempty"`
@@ -84,7 +71,7 @@ type ProviderMetadataSpec struct {
 	PreferredSupportChannels []Link                `json:"preferredSupportChannels,omitempty"`
 	HelpCenterData           []Link                `json:"helpCenterData,omitempty"`
 	DetailViewExtensions     []DetailViewExtension `json:"detailViewExtensions,omitempty"`
-	ServiceLevel             ServiceLevel          `json:"serviceLevel,omitempty"`
+	ServiceLevel             string                `json:"serviceLevel,omitempty"`
 }
 
 // ProviderMetadataStatus defines the observed state of ProviderMetadata.

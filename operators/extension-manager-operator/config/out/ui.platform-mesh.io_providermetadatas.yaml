@@ -153,15 +153,6 @@ spec:
                   type: object
                 type: array
               serviceLevel:
-                description: |-
-                  ServiceLevel describes the support coverage offered by a provider, rendered
-                  in the "Service Level" row of the provider details view.
-                enum:
-                - veryHigh24x7
-                - high24x5
-                - mediumOne16x5
-                - mediumTwo12x5
-                - low8x5
                 type: string
               tags:
                 items:

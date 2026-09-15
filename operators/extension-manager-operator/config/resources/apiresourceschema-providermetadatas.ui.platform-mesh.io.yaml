@@ -15,7 +15,7 @@
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
-  name: v260915-84f98e6a.providermetadatas.ui.platform-mesh.io
+  name: v260915-8d919cc0.providermetadatas.ui.platform-mesh.io
 spec:
   group: ui.platform-mesh.io
   names:
@@ -150,15 +150,6 @@ spec:
                 type: object
               type: array
             serviceLevel:
-              description: |-
-                ServiceLevel describes the support coverage offered by a provider, rendered
-                in the "Service Level" row of the provider details view.
-              enum:
-              - veryHigh24x7
-              - high24x5
-              - mediumOne16x5
-              - mediumTwo12x5
-              - low8x5
               type: string
             tags:
               items:
