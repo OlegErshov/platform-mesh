@@ -69,6 +69,7 @@ type ProviderMetadataSpec struct {
 
 	// Links are provider-owned links. At most one link may be marked as the
 	// main link via `main: true`.
+	// +kubebuilder:validation:MaxItems=20
 	// +kubebuilder:validation:XValidation:rule="self.filter(l, has(l.main) && l.main).size() <= 1",message="only one link may be marked as main"
 	Links []Link `json:"links,omitempty"`
 

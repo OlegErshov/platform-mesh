@@ -143,6 +143,7 @@ spec:
                     url:
                       type: string
                   type: object
+                maxItems: 20
                 type: array
                 x-kubernetes-validations:
                 - message: only one link may be marked as main

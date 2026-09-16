@@ -15,7 +15,7 @@
 apiVersion: apis.kcp.io/v1alpha1
 kind: APIResourceSchema
 metadata:
-  name: v260915-b1efd6d3.providermetadatas.ui.platform-mesh.io
+  name: v260916-a4904d7c.providermetadatas.ui.platform-mesh.io
 spec:
   group: ui.platform-mesh.io
   names:
@@ -140,6 +140,7 @@ spec:
                   url:
                     type: string
                 type: object
+              maxItems: 20
               type: array
               x-kubernetes-validations:
               - message: only one link may be marked as main
