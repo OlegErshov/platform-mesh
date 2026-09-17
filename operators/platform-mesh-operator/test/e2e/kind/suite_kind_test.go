@@ -513,6 +513,11 @@ func (s *KindTestSuite) SetupSuite() {
 	}
 	s.logger.Info().Msg("resources.delivery.ocm.software CRD established")
 
+	if err = s.waitForDeploymentReady(ctx, "ocm-system", "ocm-k8s-toolkit-controller-manager", 5*time.Minute); err != nil {
+		s.FailNow("OCM controller manager deployment not ready in time")
+	}
+	s.logger.Info().Msg("OCM controller manager ready")
+
 	if err = s.applyOCM(ctx); err != nil {
 		s.FailNow("Failed to apply OCM manifests", err)
 	}
@@ -548,6 +553,20 @@ func (s *KindTestSuite) SetupSuite() {
 	// Run the PlatformMesh operator
 	s.logger.Info().Msg("starting PlatformMesh operator...")
 	s.runPlatformMeshOperator(ctx)
+}
+
+func (s *KindTestSuite) waitForDeploymentReady(ctx context.Context, namespace, name string, timeout time.Duration) error {
+	return wait.PollUntilContextTimeout(ctx, 5*time.Second, timeout, true, func(ctx context.Context) (bool, error) {
+		deployment := &appsv1.Deployment{}
+		if err := s.client.Get(ctx, ctrlruntimeclient.ObjectKey{Namespace: namespace, Name: name}, deployment); err != nil {
+			return false, nil //nolint:nilerr
+		}
+		ready := deployment.Status.ReadyReplicas > 0
+		if !ready {
+			s.logger.Debug().Msgf("deployment %s/%s not ready yet (%d/%d)", namespace, name, deployment.Status.ReadyReplicas, *deployment.Spec.Replicas)
+		}
+		return ready, nil
+	})
 }
 
 func (s *KindTestSuite) waitForCRDEstablished(ctx context.Context, crdName string, timeout time.Duration) error {
