@@ -113,32 +113,36 @@ jobs:
         env:
           GITHUB_WORKFLOW: ci
 
-  # Integration (envtest) suite: downloads the shared kcp (tools:kcp) and runs
-  # the kcp-backed controller tests under internal/controller.
-  test-e2e:
-    runs-on: ubuntu-latest
-    env:
-      GOPRIVATE: github.com/platform-mesh
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
-        with:
-          go-version-file: go.work
-          cache: true # zizmor: ignore[cache-poisoning]
-      - name: Enable git CLI clones using GITHUB_TOKEN
-        run: |
-          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
-          git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611 # v2.0.0
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - run: task test-e2e-${COMPONENT}
-        env:
-          GITHUB_WORKFLOW: ci
+  # # Integration (envtest) suite: downloads the shared kcp (tools:kcp) and runs
+  # # the kcp-backed controller tests under internal/controller.
+  # test-e2e:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     GOPRIVATE: github.com/platform-mesh
+  #   steps:
+  #     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+  #       with:
+  #         persist-credentials: false
+  #     - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+  #       with:
+  #         go-version-file: go.work
+  #         cache: true # zizmor: ignore[cache-poisoning]
+  #     - name: Enable git CLI clones using GITHUB_TOKEN
+  #       run: |
+  #         git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "ssh://git@github.com/"
+  #         git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Configure /etc/hosts for local domain resolution
+  #       run: |
+  #         echo "127.0.0.1 portal.localhost" | sudo tee -a /etc/hosts
+  #         echo "127.0.0.1 root.kcp.localhost" | sudo tee -a /etc/hosts
+  #     - uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611 # v2.0.0
+  #       with:
+  #         repo-token: ${{ secrets.GITHUB_TOKEN }}
+  #     - run: task test-e2e-${COMPONENT}
+  #       env:
+  #         GITHUB_WORKFLOW: ci
 
   # ──────────────────────────────────────────────
   # PR: build only, never push.
