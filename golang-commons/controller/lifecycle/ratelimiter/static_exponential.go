@@ -32,12 +32,16 @@ type StaticThenExponentialRateLimiter[T comparable] struct {
 	staticWindow time.Duration
 
 	exponential workqueue.TypedRateLimiter[T]
-	clock       clock.Clock
+	clock       clock.PassiveClock
 }
 
 func NewStaticThenExponentialRateLimiter[T comparable](cfg Config) (*StaticThenExponentialRateLimiter[T], error) {
 	if err := cfg.validate(); err != nil {
 		return nil, err
+	}
+	clk := cfg.clock
+	if clk == nil {
+		clk = clock.RealClock{}
 	}
 	return &StaticThenExponentialRateLimiter[T]{
 		staticDelay:  cfg.StaticRequeueDelay,
@@ -47,7 +51,7 @@ func NewStaticThenExponentialRateLimiter[T comparable](cfg Config) (*StaticThenE
 			cfg.ExponentialMaxBackoff,
 		),
 		staticAttempts: make(map[T]time.Time),
-		clock:          clock.RealClock{},
+		clock:          clk,
 	}, nil
 }
 
