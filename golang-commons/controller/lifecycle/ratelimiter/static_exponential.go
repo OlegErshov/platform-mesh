@@ -35,6 +35,10 @@ type StaticThenExponentialRateLimiter[T comparable] struct {
 	clock       clock.PassiveClock
 }
 
+// NewStaticThenExponentialRateLimiter returns a limiter that tracks backoff per key.
+// A pointer key only matches the same instance and should not be used in a controller.
+//
+// Use the reconcile request as the key, or NewObjectRateLimiter for API objects.
 func NewStaticThenExponentialRateLimiter[T comparable](cfg Config) (*StaticThenExponentialRateLimiter[T], error) {
 	if err := cfg.validate(); err != nil {
 		return nil, err

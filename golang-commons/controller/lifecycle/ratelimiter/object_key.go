@@ -34,6 +34,7 @@ type ObjectRateLimiter[T ctrlruntimeclient.Object] struct {
 	limiter *StaticThenExponentialRateLimiter[objectKey]
 }
 
+// NewObjectRateLimiter returns a rate limiter which uses the API object identity as key.
 func NewObjectRateLimiter[T ctrlruntimeclient.Object](cfg Config) (*ObjectRateLimiter[T], error) {
 	limiter, err := NewStaticThenExponentialRateLimiter[objectKey](cfg)
 	if err != nil {
