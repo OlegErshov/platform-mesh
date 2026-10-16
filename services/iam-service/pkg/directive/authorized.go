@@ -36,7 +36,10 @@ import (
 	"go.platform-mesh.io/iam-service/pkg/metrics"
 	"go.platform-mesh.io/iam-service/pkg/workspace"
 
+	"go.platform-mesh.io/golang-commons/restmapper"
+
 	authorizationv1 "k8s.io/api/authorization/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -52,21 +55,23 @@ import (
 type selfSubjectAccessReviewer func(ctx context.Context, workspacePath, authHeader string, attrs *authorizationv1.ResourceAttributes) (bool, error)
 
 type AuthorizedDirective struct {
-	air      accountinfo.Retriever
-	wcClient workspace.ClientFactory
-	ssar     selfSubjectAccessReviewer
-	log      *logger.Logger
+	air          accountinfo.Retriever
+	wcClient     workspace.ClientFactory
+	ssar         selfSubjectAccessReviewer
+	log          *logger.Logger
+	customGVRMap map[schema.GroupKind]restmapper.GVRMapping
 }
 
 // NewAuthorizedDirective creates the directive that authorizes GraphQL fields by
 // issuing a native SelfSubjectAccessReview (SSAR) against the user's workspace.
 // The check flows kcp -> rebac-authz-webhook -> OpenFGA, so OpenFGA stays an
 // implementation detail rather than a direct dependency of iam-service.
-func NewAuthorizedDirective(air accountinfo.Retriever, cf workspace.ClientFactory, restCfg *rest.Config, log *logger.Logger) *AuthorizedDirective {
+func NewAuthorizedDirective(air accountinfo.Retriever, cf workspace.ClientFactory, restCfg *rest.Config, log *logger.Logger, customGVRMap map[schema.GroupKind]restmapper.GVRMapping) *AuthorizedDirective {
 	d := &AuthorizedDirective{
-		air:      air,
-		wcClient: cf,
-		log:      log,
+		air:          air,
+		wcClient:     cf,
+		log:          log,
+		customGVRMap: customGVRMap,
 	}
 	d.ssar = newRESTSelfSubjectAccessReviewer(restCfg)
 	return d
@@ -74,12 +79,13 @@ func NewAuthorizedDirective(air accountinfo.Retriever, cf workspace.ClientFactor
 
 // NewAuthorizedDirectiveWithReviewer creates a directive with a custom SSAR
 // implementation. Intended for testing with a fake reviewer.
-func NewAuthorizedDirectiveWithReviewer(air accountinfo.Retriever, cf workspace.ClientFactory, ssar selfSubjectAccessReviewer, log *logger.Logger) *AuthorizedDirective {
+func NewAuthorizedDirectiveWithReviewer(air accountinfo.Retriever, cf workspace.ClientFactory, ssar selfSubjectAccessReviewer, log *logger.Logger, customGVRMap map[schema.GroupKind]restmapper.GVRMapping) *AuthorizedDirective {
 	return &AuthorizedDirective{
-		air:      air,
-		wcClient: cf,
-		ssar:     ssar,
-		log:      log,
+		air:          air,
+		wcClient:     cf,
+		ssar:         ssar,
+		log:          log,
+		customGVRMap: customGVRMap,
 	}
 }
 
@@ -176,7 +182,11 @@ func (a AuthorizedDirective) testIfAllowed(ctx context.Context, rctx *graph.Reso
 		metrics.AuthorizationDuration.WithLabelValues(permission).Observe(time.Since(start).Seconds())
 	}()
 
-	attrs, err := resourceAttributes(rctx, permission, wsClient)
+	mapper := meta.RESTMapper(wsClient.RESTMapper())
+	if custom := restmapper.NewStatic(a.customGVRMap); custom != nil {
+		mapper = meta.MultiRESTMapper{mapper, custom}
+	}
+	attrs, err := resourceAttributes(rctx, permission, mapper)
 	if err != nil {
 		metrics.AuthorizationChecks.WithLabelValues("error").Inc()
 		return false, err
@@ -201,8 +211,8 @@ func (a AuthorizedDirective) testIfAllowed(ctx context.Context, rctx *graph.Reso
 // The resource's plural name and version are resolved from the workspace's
 // RESTMapper (Kind -> GVR). Non-KRM targets (no RESTMapping) are rejected so the
 // review fails closed rather than sending ambiguous attributes to the apiserver.
-func resourceAttributes(rctx *graph.ResourceContext, permission string, wsClient ctrlruntimeclient.Client) (*authorizationv1.ResourceAttributes, error) {
-	mapping, err := wsClient.RESTMapper().RESTMapping(schema.GroupKind{Group: rctx.Group, Kind: rctx.Kind})
+func resourceAttributes(rctx *graph.ResourceContext, permission string, mapper meta.RESTMapper) (*authorizationv1.ResourceAttributes, error) {
+	mapping, err := mapper.RESTMapping(schema.GroupKind{Group: rctx.Group, Kind: rctx.Kind})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to resolve REST mapping for %s/%s", rctx.Group, rctx.Kind)
 	}

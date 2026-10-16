@@ -157,7 +157,7 @@ func TestAuthorized_HappyPath(t *testing.T) {
 	reviewer := &recordingReviewer{allowed: true}
 
 	// Create directive
-	directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log)
+	directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log, nil)
 
 	// Setup context with WebToken + auth header
 	ctx = withAuth(ctx)
@@ -356,7 +356,7 @@ func TestAuthorized_ErrorCases(t *testing.T) {
 			reviewer := &recordingReviewer{allowed: true}
 
 			// Create directive
-			directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log)
+			directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log, nil)
 
 			// Setup context
 			ctx := tt.setupContext()
@@ -392,7 +392,7 @@ func TestAuthorized_ResourceNotExists(t *testing.T) {
 	reviewer := &recordingReviewer{allowed: true}
 
 	// Create directive
-	directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log)
+	directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log, nil)
 
 	// Setup context
 	ctx = withAuth(ctx)
@@ -447,7 +447,7 @@ func TestAuthorized_NotAllowed(t *testing.T) {
 	reviewer := &recordingReviewer{allowed: false}
 
 	// Create directive
-	directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log)
+	directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log, nil)
 
 	// Setup context
 	ctx = withAuth(ctx)
@@ -681,7 +681,7 @@ func TestTestIfAllowed(t *testing.T) {
 			fakeClient := setupFakeClient(t)
 			wsClient := &mockWSClient{client: fakeClient}
 
-			directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, tt.reviewer.review, log)
+			directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, tt.reviewer.review, log, nil)
 
 			result, err := directive.testIfAllowed(ctx, tt.resourceCtx, tt.permission, tt.workspacePath, testAuthHeader, fakeClient)
 
@@ -831,7 +831,7 @@ func TestTestIfResourceExists(t *testing.T) {
 			reviewer := &recordingReviewer{allowed: true}
 
 			// Create directive
-			directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log)
+			directive := NewAuthorizedDirectiveWithReviewer(accountInfoRetriever, wsClient, reviewer.review, log, nil)
 
 			// Execute test
 			result, err := directive.testIfResourceExists(ctx, tt.resourceCtx, fakeClient)
