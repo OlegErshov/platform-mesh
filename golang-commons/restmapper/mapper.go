@@ -19,15 +19,52 @@ limitations under the License.
 package restmapper
 
 import (
+	"fmt"
 	"strings"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/yaml"
 )
 
 type GVRMapping struct {
-	GVR   schema.GroupVersionResource
+	GVR schema.GroupVersionResource
 	Scope meta.RESTScopeName
+}
+
+// GVKEntry is a single GVR mapping entry as stored in a ConfigMap.
+type GVKEntry struct {
+	Group      string `yaml:"group"`
+	Kind       string `yaml:"kind"`
+	Version    string `yaml:"version"`
+	Resource   string `yaml:"resource"`
+	Namespaced bool   `yaml:"namespaced"`
+}
+
+// ParseConfigMap parses GVR mappings from a ConfigMap.
+// The ConfigMap must have a "mappings" key whose value is a YAML list of GVKEntry entries.
+func ParseConfigMap(cm corev1.ConfigMap) (map[schema.GroupKind]GVRMapping, error) {
+	raw, ok := cm.Data["mappings"]
+	if !ok {
+		return nil, nil
+	}
+	var entries []GVKEntry
+	if err := yaml.Unmarshal([]byte(raw), &entries); err != nil {
+		return nil, fmt.Errorf("parse GVR mappings: %w", err)
+	}
+	result := make(map[schema.GroupKind]GVRMapping, len(entries))
+	for _, e := range entries {
+		scope := meta.RESTScopeNameNamespace
+		if !e.Namespaced {
+			scope = meta.RESTScopeNameRoot
+		}
+		result[schema.GroupKind{Group: e.Group, Kind: e.Kind}] = GVRMapping{
+			GVR:   schema.GroupVersionResource{Group: e.Group, Version: e.Version, Resource: e.Resource},
+			Scope: scope,
+		}
+	}
+	return result, nil
 }
 
 // NewStatic builds a DefaultRESTMapper from the given mappings

@@ -57,9 +57,7 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	mcmanager "sigs.k8s.io/multicluster-runtime/pkg/manager"
 
-	"gopkg.in/yaml.v3"
 	corev1 "k8s.io/api/core/v1"
-	k8smeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -112,17 +110,20 @@ func setupRouter(ctx context.Context, mgr mcmanager.Manager, fgaClient openfgav1
 	}
 	wsClient := workspace.NewClusterClientFactory(mcClusterClient)
 
-	inClusterCfg, err := rest.InClusterConfig()
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to get in-cluster config for GVR mappings ConfigMap")
-	}
-	gvrMappingsClient, err := ctrlruntimeclient.New(inClusterCfg, ctrlruntimeclient.Options{})
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to create client for GVR mappings ConfigMap")
-	}
-	gvrMappings, err := loadGVRMappings(ctx, gvrMappingsClient, serviceCfg.GVRMappingsNamespace, serviceCfg.GVRMappingsConfigMap)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load GVR mappings from ConfigMap")
+	gvrMappings := make(map[schema.GroupKind]restmapper.GVRMapping)
+	if serviceCfg.GVRMappingsConfigMap != "" {
+		inClusterCfg, err := rest.InClusterConfig()
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to get in-cluster config for GVR mappings ConfigMap")
+		}
+		gvrMappingsClient, err := ctrlruntimeclient.New(inClusterCfg, ctrlruntimeclient.Options{})
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to create client for GVR mappings ConfigMap")
+		}
+		gvrMappings, err = loadGVRMappings(ctx, gvrMappingsClient, serviceCfg.GVRMappingsNamespace, serviceCfg.GVRMappingsConfigMap)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to load GVR mappings from ConfigMap")
+		}
 	}
 
 	ad := directive.NewAuthorizedDirective(
@@ -291,31 +292,5 @@ func loadGVRMappings(ctx context.Context, c ctrlruntimeclient.Client, namespace,
 	if err := c.Get(ctx, types.NamespacedName{Namespace: namespace, Name: name}, &cm); err != nil {
 		return nil, fmt.Errorf("get GVR mappings ConfigMap %s/%s: %w", namespace, name, err)
 	}
-	raw, ok := cm.Data["mappings"]
-	if !ok {
-		return nil, nil
-	}
-	var entries []struct {
-		Group      string `yaml:"group"`
-		Kind       string `yaml:"kind"`
-		Version    string `yaml:"version"`
-		Resource   string `yaml:"resource"`
-		Namespaced bool   `yaml:"namespaced"`
-	}
-	if err := yaml.Unmarshal([]byte(raw), &entries); err != nil {
-		return nil, fmt.Errorf("parse GVR mappings: %w", err)
-	}
-	result := make(map[schema.GroupKind]restmapper.GVRMapping, len(entries))
-	for _, e := range entries {
-		scope := k8smeta.RESTScopeNameNamespace
-		if !e.Namespaced {
-			scope = k8smeta.RESTScopeNameRoot
-		}
-		gk := schema.GroupKind{Group: e.Group, Kind: e.Kind}
-		result[gk] = restmapper.GVRMapping{
-			GVR:   schema.GroupVersionResource{Group: e.Group, Version: e.Version, Resource: e.Resource},
-			Scope: scope,
-		}
-	}
-	return result, nil
+	return restmapper.ParseConfigMap(cm)
 }

@@ -42,7 +42,6 @@ import (
 	"go.platform-mesh.io/golang-commons/restmapper"
 
 	corev1 "k8s.io/api/core/v1"
-	k8smeta "k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
@@ -56,7 +55,6 @@ import (
 
 	"github.com/kcp-dev/multicluster-provider/apiexport"
 	pathaware "github.com/kcp-dev/multicluster-provider/path-aware"
-	"gopkg.in/yaml.v3"
 )
 
 var serverCfg *config.Config
@@ -193,38 +191,9 @@ func NewServeCmd() *cobra.Command {
 }
 
 func loadGVRMappings(ctx context.Context, c ctrlruntimeclient.Client, namespace, name string) (map[schema.GroupKind]restmapper.GVRMapping, error) {
-	if name == "" {
-		return nil, nil
-	}
 	var cm corev1.ConfigMap
 	if err := c.Get(ctx, types.NamespacedName{Namespace: namespace, Name: name}, &cm); err != nil {
 		return nil, fmt.Errorf("get GVR mappings ConfigMap %s/%s: %w", namespace, name, err)
 	}
-	raw, ok := cm.Data["mappings"]
-	if !ok {
-		return nil, nil
-	}
-	var entries []struct {
-		Group      string `yaml:"group"`
-		Kind       string `yaml:"kind"`
-		Version    string `yaml:"version"`
-		Resource   string `yaml:"resource"`
-		Namespaced bool   `yaml:"namespaced"`
-	}
-	if err := yaml.Unmarshal([]byte(raw), &entries); err != nil {
-		return nil, fmt.Errorf("parse GVR mappings: %w", err)
-	}
-	result := make(map[schema.GroupKind]restmapper.GVRMapping, len(entries))
-	for _, e := range entries {
-		scope := k8smeta.RESTScopeNameNamespace
-		if !e.Namespaced {
-			scope = k8smeta.RESTScopeNameRoot
-		}
-		gk := schema.GroupKind{Group: e.Group, Kind: e.Kind}
-		result[gk] = restmapper.GVRMapping{
-			GVR:   schema.GroupVersionResource{Group: e.Group, Version: e.Version, Resource: e.Resource},
-			Scope: scope,
-		}
-	}
-	return result, nil
+	return restmapper.ParseConfigMap(cm)
 }
