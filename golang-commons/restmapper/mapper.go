@@ -29,7 +29,7 @@ import (
 )
 
 type GVRMapping struct {
-	GVR schema.GroupVersionResource
+	GVR   schema.GroupVersionResource
 	Scope meta.RESTScopeName
 }
 
@@ -45,16 +45,16 @@ type GVKEntry struct {
 // ParseConfigMap parses GVR mappings from a ConfigMap.
 // The ConfigMap must have a "mappings" key whose value is a YAML list of GVKEntry entries.
 func ParseConfigMap(cm corev1.ConfigMap) (map[schema.GroupKind]GVRMapping, error) {
-	raw, ok := cm.Data["mappings"]
+	data, ok := cm.Data["mappings"]
 	if !ok {
 		return nil, nil
 	}
-	var entries []GVKEntry
-	if err := yaml.Unmarshal([]byte(raw), &entries); err != nil {
+	var gvks []GVKEntry
+	if err := yaml.Unmarshal([]byte(data), &gvks); err != nil {
 		return nil, fmt.Errorf("parse GVR mappings: %w", err)
 	}
-	result := make(map[schema.GroupKind]GVRMapping, len(entries))
-	for _, e := range entries {
+	result := make(map[schema.GroupKind]GVRMapping, len(gvks))
+	for _, e := range gvks {
 		scope := meta.RESTScopeNameNamespace
 		if !e.Namespaced {
 			scope = meta.RESTScopeNameRoot
