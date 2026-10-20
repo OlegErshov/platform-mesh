@@ -199,9 +199,6 @@ func (a AuthorizedDirective) testIfAllowed(ctx context.Context, rctx *graph.Reso
 }
 
 // resourceAttributes maps a GraphQL ResourceContext to SAR ResourceAttributes.
-// The resource's plural name and version are resolved from the workspace's
-// RESTMapper (Kind -> GVR). Non-KRM targets (no RESTMapping) are rejected so the
-// review fails closed rather than sending ambiguous attributes to the apiserver.
 func resourceAttributes(rctx *graph.ResourceContext, permission string, mapper k8smeta.RESTMapper) (*authorizationv1.ResourceAttributes, error) {
 	mapping, err := mapper.RESTMapping(schema.GroupKind{Group: rctx.Group, Kind: rctx.Kind})
 	if err != nil {
