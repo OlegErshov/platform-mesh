@@ -65,16 +65,16 @@ type RolesConfig struct {
 }
 
 type ServiceConfig struct {
-	Port                    int
-	OpenFGA                 OpenFGAConfig
-	JWT                     JWTConfig
-	IDM                     IDMConfig
-	Keycloak                KeycloakConfig
-	Pagination              PaginationConfig
-	Sorting                 SortingConfig
-	Roles                   RolesConfig
-	GVRMappingsConfigMap    string
-	GVRMappingsNamespace    string
+	Port                 int
+	OpenFGA              OpenFGAConfig
+	JWT                  JWTConfig
+	IDM                  IDMConfig
+	Keycloak             KeycloakConfig
+	Pagination           PaginationConfig
+	Sorting              SortingConfig
+	Roles                RolesConfig
+	GVRMappingsConfigMap string
+	GVRMappingsNamespace string
 }
 
 func NewServiceConfig() *ServiceConfig {

@@ -30,13 +30,12 @@ import (
 	pmcontext "go.platform-mesh.io/golang-commons/context"
 	"go.platform-mesh.io/golang-commons/errors"
 	"go.platform-mesh.io/golang-commons/logger"
+	"go.platform-mesh.io/golang-commons/restmapper"
 	"go.platform-mesh.io/iam-service/pkg/accountinfo"
 	appcontext "go.platform-mesh.io/iam-service/pkg/context"
 	"go.platform-mesh.io/iam-service/pkg/graph"
 	"go.platform-mesh.io/iam-service/pkg/metrics"
 	"go.platform-mesh.io/iam-service/pkg/workspace"
-
-	"go.platform-mesh.io/golang-commons/restmapper"
 
 	authorizationv1 "k8s.io/api/authorization/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -182,7 +181,7 @@ func (a AuthorizedDirective) testIfAllowed(ctx context.Context, rctx *graph.Reso
 		metrics.AuthorizationDuration.WithLabelValues(permission).Observe(time.Since(start).Seconds())
 	}()
 
-	mapper := meta.RESTMapper(wsClient.RESTMapper())
+	mapper := wsClient.RESTMapper()
 	if custom := restmapper.NewStatic(a.customGVRMap); custom != nil {
 		mapper = meta.MultiRESTMapper{mapper, custom}
 	}
