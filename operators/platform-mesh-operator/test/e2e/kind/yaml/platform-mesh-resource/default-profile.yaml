@@ -252,11 +252,7 @@ data:
               for: infra
               path: kcp.etcd.backup.image.tag
               image-ref: combined
-          dependsOn:
-          - name: keycloak-operator
-            namespace: platform-mesh-system
-          - name: cnpg-operator
-            namespace: platform-mesh-system
+          dependsOn: []
           # The infra chart has no knob for the kcp cache-server, and kcp-operator defaults
           # it to 2 replicas x 500m / 1Gi with an external etcd. One replica is plenty for
           # the e2e and keeps the stack schedulable on the default CI runner.
@@ -389,6 +385,8 @@ data:
           enabled: true
           values:
             caSecret: domain-certificate-ca
+            keycloak:
+              baseUrl: "https://{{ .baseDomainPort }}/keycloak"
             extraArgs:
             - --no-json
             cors:
@@ -853,11 +851,7 @@ data:
           syncWave: 4
           enabled: false
           targetNamespace: observability
-          dependsOn:
-          - name: prometheus-operator-crds
-            namespace: platform-mesh-system
-          - name: opentelemetry-operator
-            namespace: platform-mesh-system
+          dependsOn: []
           values:
             prometheus:
               server:
