@@ -26,7 +26,7 @@ spec:
   semver: {{ .Values.ocm.version | quote }}
   interval: 1m
   verify:
-    - signature: helm-charts.platform-mesh
+    - signature: platform-mesh.platform-mesh
       secretRef:
         name: ocm-signing-public-cert
   ocmConfig:

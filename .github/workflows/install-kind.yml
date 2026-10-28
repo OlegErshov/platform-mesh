@@ -26,15 +26,13 @@ name: install-kind
 # to any other chart is not. Those changes are first tested by a prerelease
 # or release candidate; see docs/release/process.md.
 
+# PARKED: runs on demand only. The first release candidates built from current
+# main showed that the components on main have not been deployed together since
+# September (the old kind test installed the frozen 0.6.0-build.6 aggregate):
+# the portal's extension lookup is broken by the APIExport split (#333) and the
+# smoke test cannot pass until that is fixed. Re-enable the pull_request and
+# merge_group triggers once a release candidate passes this workflow by hand.
 on:
-  pull_request:
-    paths:
-      - 'charts/platform-mesh-operator/**'
-      - 'charts/platform-mesh-prerequisites/**'
-      - 'installation/**'
-      - 'tests/**'
-      - '.github/workflows/install-kind.yml'
-  merge_group:
   workflow_dispatch:
     inputs:
       platform-mesh-version:
@@ -79,13 +77,20 @@ jobs:
           set -euo pipefail
           version="$INPUT_VERSION"
           if [ -z "$version" ]; then
-            # Latest release; release candidates only if there is no final release yet.
-            version="$(gh release list --exclude-drafts --exclude-pre-releases --limit 1 --json tagName --jq '.[0].tagName // empty')"
+            # Latest Platform Mesh release (tags vYY.MM.P); the repository also has
+            # releases of the Go modules (apis/v0.2.0, ...), which are not installable.
+            # Release candidates only if there is no final release yet.
+            pm_releases='map(select(.tagName | test("^v[0-9]+\\.[0-9]+\\.[0-9]+(-rc\\.[0-9]+)?$")))'
+            version="$(gh release list --exclude-drafts --exclude-pre-releases --limit 50 --json tagName --jq "$pm_releases | .[0].tagName // empty")"
             if [ -z "$version" ]; then
-              version="$(gh release list --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName // empty')"
+              version="$(gh release list --exclude-drafts --limit 50 --json tagName --jq "$pm_releases | .[0].tagName // empty")"
             fi
-            [ -n "$version" ] || { echo "::error::no release found in $GH_REPO; pass platform-mesh-version"; exit 1; }
+            [ -n "$version" ] || { echo "::error::no Platform Mesh release (vYY.MM.P) found in $GH_REPO; pass platform-mesh-version"; exit 1; }
           fi
+          case "$version" in
+            v[0-9]*.[0-9]*.[0-9]*|[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "::error::'$version' is not a Platform Mesh version"; exit 1 ;;
+          esac
           version="${version#v}"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Installing Platform Mesh $version" >> "$GITHUB_STEP_SUMMARY"
@@ -225,26 +230,12 @@ jobs:
           echo "cluster_ip=${ip}" >> "$GITHUB_OUTPUT"
           echo "Traefik ClusterIP: ${ip}"
 
-      - name: Trust this repository's OCM signing certificate
-        # The chart bundles the platform-mesh organisation's certificate. Components
-        # published from this repository are signed with OCM_SIGNING_CERT under the
-        # name OCM_SIGNATURE_NAME (job-publish.yml); verify against exactly that, so
-        # the workflow also works in a fork that signs with its own key.
-        env:
-          OCM_SIGNING_CERT: ${{ secrets.OCM_SIGNING_CERT }}
-          SIGNATURE: ${{ vars.OCM_SIGNATURE_NAME || 'platform-mesh.platform-mesh' }}
-        run: |
-          [ -n "$OCM_SIGNING_CERT" ] || { echo "::error::OCM_SIGNING_CERT secret is not set"; exit 1; }
-          kubectl --namespace platform-mesh-system create secret generic ocm-signing-public-cert \
-            --from-literal="${SIGNATURE}=${OCM_SIGNING_CERT}"
-
       - name: Install platform-mesh-operator (kind profile)
         env:
           HELM: ${{ steps.helm.outputs.path }}
           PM_VERSION: ${{ steps.version.outputs.version }}
           TRAEFIK_CLUSTER_IP: ${{ steps.traefik.outputs.cluster_ip }}
           OWNER: ${{ github.repository_owner }}
-          SIGNATURE: ${{ vars.OCM_SIGNATURE_NAME || 'platform-mesh.platform-mesh' }}
         run: |
           # hostAliases is intentionally not set: the operator reaches
           # kcp via the in-cluster front-proxy Service, and component pods get their
@@ -264,8 +255,7 @@ jobs:
             --set ocm.enabled=true \
             --set ocm.profile=kind \
             --set ocm.repository="ghcr.io/${OWNER}" \
-            --set ocm.signatureName="${SIGNATURE}" \
-            --set ocm.installSigningCertificate=false \
+            --set ocm.installSigningCertificate=true \
             --set image.repository="${OWNER}/platform-mesh/platform-mesh-operator" \
             --set image.tag="v${PM_VERSION}" \
             --set gateway.baseDomain="${BASE_DOMAIN}" \

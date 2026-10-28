@@ -67,7 +67,7 @@ jobs:
       security-events: write # trivy SARIF reports
     secrets:
       OCM_SIGNING_PRIVATE_KEY: ${{ secrets.OCM_SIGNING_PRIVATE_KEY }}
-      OCM_SIGNING_CERT: ${{ secrets.OCM_SIGNING_CERT }}
+      OCM_SIGNING_CERT: ${{ vars.OCM_SIGNING_CERT }}
     with:
       version: ${{ needs.version.outputs.version }}
 

@@ -21,7 +21,7 @@ deployment:
   serverUrl: https://frontproxy-front-proxy.platform-mesh-system:8443
   resourceSchemaName: "v250704-6d57f16.contentconfigurations.ui.platform-mesh.io"
   resourceSchemaWorkspace: root:platform-mesh-system
-  resourceSchemaExportName: core.platform-mesh.io
+  resourceSchemaExportName: ui.platform-mesh.io
   mainEntityName: main
   accountEntityName: core_platform-mesh_io_account
 

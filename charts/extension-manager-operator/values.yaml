@@ -35,7 +35,7 @@ kubeconfigSecret: ""
 kcp:
   kubeconfig:
     secret: extension-manager-operator-kubeconfig
-  apiExportEndpointSliceName: "core.platform-mesh.io"
+  apiExportEndpointSliceName: "ui.platform-mesh.io"
 
 # -- Path prefix for routing rules in Gateway API and Istio VirtualService
 pathPrefix: /validate
