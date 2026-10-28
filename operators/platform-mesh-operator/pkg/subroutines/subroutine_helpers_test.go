@@ -520,3 +520,56 @@ metadata:
 	s.Assert().Nil(err)
 	cl.AssertNotCalled(s.T(), "Apply")
 }
+
+// TestGetExposureParams_ClusterIPResolution covers resolution of the gateway Service
+// ClusterIP, including the fallback to the deprecated TraefikClusterIP field.
+func TestGetExposureParams_ClusterIPResolution(t *testing.T) {
+	const defaultClusterIP = "10.96.188.4"
+
+	tests := []struct {
+		name     string
+		exposure *pmcorev1alpha1.ExposureConfig
+		want     string
+	}{
+		{
+			name:     "nil exposure uses default",
+			exposure: nil,
+			want:     defaultClusterIP,
+		},
+		{
+			name:     "empty exposure uses default",
+			exposure: &pmcorev1alpha1.ExposureConfig{},
+			want:     defaultClusterIP,
+		},
+		{
+			name:     "new field is honored",
+			exposure: &pmcorev1alpha1.ExposureConfig{GatewayServiceClusterIP: "10.0.0.1"},
+			want:     "10.0.0.1",
+		},
+		{
+			name:     "deprecated field is honored as fallback",
+			exposure: &pmcorev1alpha1.ExposureConfig{TraefikClusterIP: "10.0.0.2"},
+			want:     "10.0.0.2",
+		},
+		{
+			name: "new field wins over deprecated field",
+			exposure: &pmcorev1alpha1.ExposureConfig{
+				GatewayServiceClusterIP: "10.0.0.1",
+				TraefikClusterIP:        "10.0.0.2",
+			},
+			want: "10.0.0.1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inst := &pmcorev1alpha1.PlatformMesh{}
+			inst.Spec.Exposure = tt.exposure
+
+			p := getExposureParams(inst)
+
+			require.Equal(t, tt.want, p.gatewayServiceClusterIP)
+			require.Equal(t, tt.want, p.templateVars(config.KCPConfig{})["gatewayServiceClusterIP"])
+		})
+	}
+}

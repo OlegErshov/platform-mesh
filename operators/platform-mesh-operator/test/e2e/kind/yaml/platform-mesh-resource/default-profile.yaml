@@ -76,7 +76,7 @@ data:
               experimentalChannel: true
           service:
             spec:
-              clusterIP: "{{ .traefikClusterIP }}"
+              clusterIP: "{{ .gatewayServiceClusterIP }}"
             type: NodePort
       etcdDruid:
         enabled: true
@@ -289,7 +289,7 @@ data:
             hostAliases:
               enabled: true
               entries:
-              - ip: "{{ .traefikClusterIP }}"
+              - ip: "{{ .gatewayServiceClusterIP }}"
                 hostnames:
                 - "localhost"
                 - "portal.localhost"
@@ -417,7 +417,7 @@ data:
             hostAliases:
               enabled: true
               values:
-                - ip: "{{ .traefikClusterIP }}"
+                - ip: "{{ .gatewayServiceClusterIP }}"
                   hostnames:
                     - "localhost"
                     - "kcp.api.{{ .baseDomain }}"
@@ -658,7 +658,7 @@ data:
             hostAliases:
               enabled: true
               entries:
-              - ip: "{{ .traefikClusterIP }}"
+              - ip: "{{ .gatewayServiceClusterIP }}"
                 hostnames:
                 - "localhost"
                 - "portal.localhost"

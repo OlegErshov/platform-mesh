@@ -419,21 +419,21 @@ func MergeValuesAndServices(inst *pmcorev1alpha1.PlatformMesh, templateVars apie
 }
 
 type exposureParams struct {
-	baseDomain             string
-	baseDomainPort         string
-	port                   int
-	protocol               string
-	traefikClusterIP       string
-	kcpFrontProxyClusterIP string
+	baseDomain              string
+	baseDomainPort          string
+	port                    int
+	protocol                string
+	gatewayServiceClusterIP string
+	kcpFrontProxyClusterIP  string
 }
 
 func getExposureParams(inst *pmcorev1alpha1.PlatformMesh) exposureParams {
 	p := exposureParams{
-		port:                   8443,
-		baseDomain:             "portal.localhost",
-		protocol:               "https",
-		traefikClusterIP:       "10.96.188.4",
-		kcpFrontProxyClusterIP: "10.96.0.100",
+		port:                    8443,
+		baseDomain:              "portal.localhost",
+		protocol:                "https",
+		gatewayServiceClusterIP: "10.96.188.4",
+		kcpFrontProxyClusterIP:  "10.96.0.100",
 	}
 
 	if inst.Spec.Exposure != nil {
@@ -446,8 +446,11 @@ func getExposureParams(inst *pmcorev1alpha1.PlatformMesh) exposureParams {
 		if inst.Spec.Exposure.Protocol != "" {
 			p.protocol = inst.Spec.Exposure.Protocol
 		}
-		if inst.Spec.Exposure.TraefikClusterIP != "" {
-			p.traefikClusterIP = inst.Spec.Exposure.TraefikClusterIP
+		if inst.Spec.Exposure.GatewayServiceClusterIP != "" {
+			p.gatewayServiceClusterIP = inst.Spec.Exposure.GatewayServiceClusterIP
+		} else if inst.Spec.Exposure.TraefikClusterIP != "" {
+			// Deprecated field fallback: honor TraefikClusterIP until it is removed.
+			p.gatewayServiceClusterIP = inst.Spec.Exposure.TraefikClusterIP
 		}
 		if inst.Spec.Exposure.KcpFrontProxyClusterIP != "" {
 			p.kcpFrontProxyClusterIP = inst.Spec.Exposure.KcpFrontProxyClusterIP
@@ -479,13 +482,13 @@ func (p exposureParams) internalFrontProxyURL(kcp config.KCPConfig) string {
 
 func (p exposureParams) templateVars(kcp config.KCPConfig) map[string]any {
 	return map[string]any{
-		"baseDomain":             p.baseDomain,
-		"baseDomainPort":         p.baseDomainPort,
-		"port":                   p.portString(),
-		"protocol":               p.protocol,
-		"traefikClusterIP":       p.traefikClusterIP,
-		"kcpFrontProxyClusterIP": p.kcpFrontProxyClusterIP,
-		"internalFrontProxyUrl":  p.internalFrontProxyURL(kcp),
+		"baseDomain":              p.baseDomain,
+		"baseDomainPort":          p.baseDomainPort,
+		"port":                    p.portString(),
+		"protocol":                p.protocol,
+		"gatewayServiceClusterIP": p.gatewayServiceClusterIP,
+		"kcpFrontProxyClusterIP":  p.kcpFrontProxyClusterIP,
+		"internalFrontProxyUrl":   p.internalFrontProxyURL(kcp),
 	}
 }
 

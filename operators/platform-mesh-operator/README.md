@@ -49,7 +49,7 @@ spec:
     baseDomain: example.com          # Base domain for exposure (default: portal.localhost)
     port: 443                        # Port to expose services on (default: 8443)
     protocol: https                  # Protocol, http or https (default: https)
-    traefikClusterIP: 10.96.188.4    # In-cluster IP of the Traefik gateway service (default: 10.96.188.4)
+    gatewayServiceClusterIP: 10.96.188.4  # In-cluster ClusterIP of the gateway 
     kcpFrontProxyClusterIP: 10.96.0.100  # In-cluster IP of the KCP front-proxy service (default: 10.96.0.100)
 ```
 
@@ -58,7 +58,8 @@ spec:
 | `baseDomain` | string | `portal.localhost` | Base domain the platform is served on. |
 | `port` | int | `8443` | External port. Standard ports 80/443 are omitted from `baseDomainPort`. |
 | `protocol` | string | `https` | URL scheme used for externally exposed services. |
-| `traefikClusterIP` | string | `10.96.188.4` | ClusterIP of the Traefik gateway `Service`, injected into profiles that pin it (e.g. `service.clusterIP`, `hostAliases`). |
+| `gatewayServiceClusterIP` | string | `10.96.188.4` | ClusterIP of the gateway (Traefik) `Service`, injected into profiles that pin it (e.g. `service.clusterIP`, `hostAliases`). |
+| `traefikClusterIP` | string | `10.96.188.4` | **Deprecated** — use `gatewayServiceClusterIP`. Still honored when `gatewayServiceClusterIP` is unset; will be removed in a future. |
 | `kcpFrontProxyClusterIP` | string | `10.96.0.100` | ClusterIP of the KCP front-proxy `Service`, injected where profiles reference it. |
 
 These values are the single source of truth for the exposure-derived template variables (see [Template Variables](#template-variables)); the operator computes the derived vars (`baseDomainPort`, `baseDomainWithPort`, `internalFrontProxyUrl`) from them.
@@ -317,7 +318,7 @@ The operator renders deployment manifests directly from Go templates located in:
 - `gotemplates/infra/` — infrastructure components (cert-manager, traefik, gateway-api, etcd-druid, kcp-operator)
 - `gotemplates/components/` — application components (HelmReleases, OCM Resources for each service)
 
-These templates are rendered using the profile ConfigMap data merged with exposure-derived template variables (`baseDomain`, `baseDomainPort`, `port`, `protocol`, `traefikClusterIP`, `kcpFrontProxyClusterIP`, `internalFrontProxyUrl`). The gotemplates replace the previously used `platform-mesh-operator-components` and `platform-mesh-operator-infra-components` Helm charts.
+These templates are rendered using the profile ConfigMap data merged with exposure-derived template variables (`baseDomain`, `baseDomainPort`, `port`, `protocol`, `gatewayServiceClusterIP`, `kcpFrontProxyClusterIP`, `internalFrontProxyUrl`). The gotemplates replace the previously used `platform-mesh-operator-components` and `platform-mesh-operator-infra-components` Helm charts.
 
 ### Deployment Technologies
 
@@ -401,7 +402,7 @@ gotemplates/
 | `kubeConfigSecretKey` | `--remote-runtime-infra-secret-key` |
 | `<component>.enabled` | From profile infra section (e.g., `.certManager.enabled`) |
 | `<component>.values` | Helm values from profile |
-| `baseDomain`, `baseDomainPort`, `port`, `protocol`, `traefikClusterIP`, `kcpFrontProxyClusterIP`, `internalFrontProxyUrl` | Exposure-derived (from `spec.exposure`; see [Exposure Configuration](#exposure-configuration)) |
+| `baseDomain`, `baseDomainPort`, `port`, `protocol`, `gatewayServiceClusterIP`, `kcpFrontProxyClusterIP`, `internalFrontProxyUrl` | Exposure-derived (from `spec.exposure`; see [Exposure Configuration](#exposure-configuration)) |
 
 **Component templates** (`gotemplates/components/`) receive:
 
@@ -421,7 +422,7 @@ gotemplates/
 | `baseDomainWithPort` | `baseDomain` with `:port` suffix (omitted only for port 443) |
 | `port` | From `spec.exposure.port` |
 | `protocol` | From `spec.exposure.protocol` |
-| `traefikClusterIP` | From `spec.exposure.traefikClusterIP` |
+| `gatewayServiceClusterIP` | From `spec.exposure.gatewayServiceClusterIP` (falls back to the deprecated `spec.exposure.traefikClusterIP`) |
 | `kcpFrontProxyClusterIP` | From `spec.exposure.kcpFrontProxyClusterIP` |
 | `internalFrontProxyUrl` | In-cluster KCP front-proxy URL, derived from operator KCP config |
 
@@ -469,7 +470,7 @@ components:
           port: {{ .port }}
 ```
 
-Available variables in the profile template context: `baseDomain`, `baseDomainPort`, `port`, `protocol`, `traefikClusterIP`, `kcpFrontProxyClusterIP`, `internalFrontProxyUrl`, `helmReleaseNamespace`.
+Available variables in the profile template context: `baseDomain`, `baseDomainPort`, `port`, `protocol`, `gatewayServiceClusterIP`, `kcpFrontProxyClusterIP`, `internalFrontProxyUrl`, `helmReleaseNamespace`.
 
 #### Template Syntax Examples
 

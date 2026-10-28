@@ -400,7 +400,7 @@ func (r *DeploymentSubroutine) templateVarsFromProfileInfra(ctx context.Context,
 	// Ensure helmReleaseNamespace is set: prefer deploymentNamespace, then existing helmReleaseNamespace, then inst.Namespace
 	tmplVars["helmReleaseNamespace"] = infraHelmReleaseNamespace(tmplVars, inst.Namespace)
 
-	// Inject exposure-derived vars so the infra profile can use {{ .traefikClusterIP }} etc.
+	// Inject exposure-derived vars so the infra profile can use {{ .gatewayServiceClusterIP }} etc.
 	for k, v := range getExposureParams(inst).templateVars(r.cfgOperator.KCP) {
 		tmplVars[k] = v
 	}
@@ -601,7 +601,7 @@ func (r *DeploymentSubroutine) buildComponentsTemplateVars(ctx context.Context, 
 		return nil, nil, errors.Wrap(err, "Failed to merge profile-components.yaml with templateVars")
 	}
 
-	// Inject exposure-derived vars so profile templates like {{ .traefikClusterIP }} render correctly.
+	// Inject exposure-derived vars so profile templates like {{ .gatewayServiceClusterIP }} render correctly.
 	// These are added after the templateVars merge so they can't be overridden by the profile config,
 	// but they are available when the profile YAML itself is rendered as a template.
 	{
