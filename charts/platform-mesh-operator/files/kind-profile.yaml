@@ -98,11 +98,6 @@ data:
             kcp:
               enabled: true
               kubeconfigSecret: extension-manager-operator-kubeconfig
-              # TEMPORARY: the chart default changed to ui.platform-mesh.io
-              # (platform-mesh#333 moved ContentConfigurations there), but the
-              # installed chart version still has core.platform-mesh.io until the
-              # next release. Remove once 26.10.0-rc.2 or later is out.
-              apiExportEndpointSliceName: "ui.platform-mesh.io"
             tracing:
               collector:
                 host: observability-opentelemetry-collector.observability.svc.cluster.local:4317
@@ -680,8 +675,6 @@ data:
               serverUrl: "{{ .internalFrontProxyUrl }}"
               resourceSchemaName: "v250704-6d57f16.contentconfigurations.ui.platform-mesh.io"
               resourceSchemaWorkspace: "root:platform-mesh-system"
-              # TEMPORARY: same as for the extension-manager-operator above.
-              resourceSchemaExportName: "ui.platform-mesh.io"
         marketplace-ui:
           enabled: true
           dependsOn: []
