@@ -25,7 +25,7 @@ stringData:
     jKy9URJ7BhSsD0BHQxP7/RGDgECE3HKNLzGRzL5umizURfzbkbrTAizXnexvn+Y7
     CGmLhO/M52fTVWj1nJRUZ+iZwVRZ91kaYCH+snkKSO8=
     -----END CERTIFICATE-----
-  # helm-charts.platform-mesh is for PM >= 0.4.0-build.516
+  # helm-charts.platform-mesh is for PM >= 0.4.0-build.516 and before the calver switch
   helm-charts.platform-mesh: |
     -----BEGIN CERTIFICATE-----
     MIIDJTCCAg2gAwIBAgIRAOQbL/00v+AIVfzPtA7gB74wDQYJKoZIhvcNAQELBQAw
@@ -45,4 +45,25 @@ stringData:
     9AB+kceG/FrUjbNEBwC4QN8gh9b2oSd1godKWxJWqU8542S52nRClwT9jcfsy4sg
     rfCnWros84HAi10shwcW38onK4pdnfjgv3NIt0DGZT+ATYA2Fmp0gDoYjsY4iJUy
     TUBiZmEb9sPGteTmpJwDTy1GeZwGNc+eb16/6sA9jdurTa57deJfsoo=
+    -----END CERTIFICATE-----
+  # platform-mesh.platform-mesh is valid after the calver switch
+  platform-mesh.platform-mesh: |
+    -----BEGIN CERTIFICATE-----
+    MIIDJjCCAg6gAwIBAgIQD/EiXBB8gw5NZdeJ1yiW5jANBgkqhkiG9w0BAQsFADAw
+    MRYwFAYDVQQKDA1QbGF0Zm9ybSBNZXNoMRYwFAYDVQQDDA1wbGF0Zm9ybS1tZXNo
+    MB4XDTI2MDYxOTExMjYxOVoXDTM2MDYxNjExMjYxOVowJjEkMCIGA1UEAxMbcGxh
+    dGZvcm0tbWVzaC5wbGF0Zm9ybS1tZXNoMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+    MIIBCgKCAQEA7QpFKWnD2LZI4rXcVlyv8KEQ1KcRR9lCRE+J9yGtlsUQe7tmoFvn
+    GvPVvbMsQzCZWFWZIRt0jCvn0tueI1mKo3tQyhyDulRECfB40p6bEfs/CVhCBYPH
+    /5gAvx42QXJUtGHWnBv/ZEQkv8r0h/q5d3zPPEwxvXFHTdpKUWNuLfp2Af9gh9SF
+    TUZeip2hXNLCvRU1U3JQPZ4uX0e7V2uKQLto/WQyzSmu27LyUE5EjUht3DWri6tZ
+    ffbq2VmE5ahFq+t/soY7hdmVZCLO9JozgjpuPPoeHboZZ1prnA14/tgDXakKehtB
+    BCUbvKalUAOmLfHzPx2UwRTsyYkwWKBHGwIDAQABo0YwRDATBgNVHSUEDDAKBggr
+    BgEFBQcDAzAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFMqDx8bU2e3dxUMqADyP
+    zoGvT/ilMA0GCSqGSIb3DQEBCwUAA4IBAQAEo6lLouTrv39TZCaHYF75D24VGlW6
+    Z97QjTpkN89IzHAniPE/zLGfl7lOAmUSZHfzK2/xCLehswKAHcmKFZLIfW7xMUZj
+    8Emd6Aq2CcaBNe0Yxuup1X1GxdI56bx7w8647b+35C0KdzOLTt4d+k8Zinx4R/4g
+    Ajkyacy1VLq8+R8WSjJL3sB1u2DX04W7XekEZ9Nk+C1JHWpfhW7jfI8Tnxj25j7h
+    3y8dK/cbWstl1k5Z17nzaemODT1+W35WwcKgzKQyRz9ZTXltGnmV69sUsX5ScSOL
+    ZakfoP7W+TcOWGLlFpwVBkgtUdZVWr7uIfvH+SnNFwbgBj/nqZnZCfOy
     -----END CERTIFICATE-----

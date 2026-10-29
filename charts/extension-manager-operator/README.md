@@ -25,7 +25,7 @@ A Helm chart for extension-manager-operator which manages resources like Content
 | image.registry | string | `"ghcr.io"` | The image registry |
 | image.repository | string | `"platform-mesh/platform-mesh/extension-manager-operator"` | The image repository path (without registry) |
 | istio.enabled | bool | `false` | enable Istio VirtualService |
-| kcp.apiExportEndpointSliceName | string | `"core.platform-mesh.io"` |  |
+| kcp.apiExportEndpointSliceName | string | `"ui.platform-mesh.io"` |  |
 | kcp.kubeconfig.secret | string | `"extension-manager-operator-kubeconfig"` |  |
 | kubeconfigSecret | string | `""` |  |
 | pathPrefix | string | `"/validate"` | Path prefix for routing rules in Gateway API and Istio VirtualService |

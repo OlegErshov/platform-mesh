@@ -166,7 +166,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OCM_SIGNING_PRIVATE_KEY: ${{ secrets.OCM_SIGNING_PRIVATE_KEY }}
-          OCM_SIGNING_CERT: ${{ secrets.OCM_SIGNING_CERT }}
+          OCM_SIGNING_CERT: ${{ vars.OCM_SIGNING_CERT }}
         run: |
           set -euo pipefail
           if [ -z "$OCM_SIGNING_PRIVATE_KEY" ] || [ -z "$OCM_SIGNING_CERT" ]; then
@@ -270,7 +270,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OCM_SIGNING_PRIVATE_KEY: ${{ secrets.OCM_SIGNING_PRIVATE_KEY }}
-          OCM_SIGNING_CERT: ${{ secrets.OCM_SIGNING_CERT }}
+          OCM_SIGNING_CERT: ${{ vars.OCM_SIGNING_CERT }}
       - name: Build and publish OCM components
         run: |
           set -euo pipefail
@@ -323,7 +323,7 @@ jobs:
       - name: Registry credentials (public key only, no signing key)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OCM_SIGNING_CERT: ${{ secrets.OCM_SIGNING_CERT }}
+          OCM_SIGNING_CERT: ${{ vars.OCM_SIGNING_CERT }}
         run: |
           set -euo pipefail
           echo "$GITHUB_TOKEN" | "$HELM" registry login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
