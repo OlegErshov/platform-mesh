@@ -26,13 +26,15 @@ name: install-kind
 # to any other chart is not. Those changes are first tested by a prerelease
 # or release candidate; see docs/release/process.md.
 
-# PARKED: runs on demand only. The first release candidates built from current
-# main showed that the components on main have not been deployed together since
-# September (the old kind test installed the frozen 0.6.0-build.6 aggregate):
-# the portal's extension lookup is broken by the APIExport split (#333) and the
-# smoke test cannot pass until that is fixed. Re-enable the pull_request and
-# merge_group triggers once a release candidate passes this workflow by hand.
 on:
+  pull_request:
+    paths:
+      - 'charts/platform-mesh-operator/**'
+      - 'charts/platform-mesh-prerequisites/**'
+      - 'installation/**'
+      - 'tests/**'
+      - '.github/workflows/install-kind.yml'
+  merge_group:
   workflow_dispatch:
     inputs:
       platform-mesh-version:
