@@ -189,10 +189,10 @@ Infrastructure dependencies for a Platform Mesh installation (KCP, Keycloak, Tra
 | keycloak.operator.health.startup.path | string | `"/keycloak/health"` |  |
 | keycloak.operator.hostname | string | `""` | Keycloak hostname (used in the Keycloak CR hostname.hostname field). Must not include a path — the operator auto-derives http-relative-path from any path component, which conflicts with the value baked into the image. |
 | keycloak.operator.httpEnabled | bool | `true` | Enable plain HTTP on the Keycloak pod. Keycloak sits behind Traefik, which handles terminates TLS. |
-| keycloak.operator.image.digest | string | `"sha256:5feb71bdf548ee2f7ff33ba2eba082a94de5c16d1a50de8bca71ab78a89c986b"` | Keycloak image digest (when set, overrides tag: registry/repository@digest) |
+| keycloak.operator.image.digest | string | `""` | Keycloak image digest (when set, overrides tag: registry/repository@digest) |
 | keycloak.operator.image.registry | string | `"ghcr.io"` | Keycloak image registry |
 | keycloak.operator.image.repository | string | `"platform-mesh/custom-images/keycloak"` | Keycloak image repository (without registry) |
-| keycloak.operator.image.tag | string | `"v26.7.2"` | Keycloak image tag (defaults to appVersion) |
+| keycloak.operator.image.tag | string | `"v26.8.1"` | Keycloak image tag (defaults to appVersion) |
 | keycloak.operator.instances | int | `1` | Number of Keycloak instances |
 | keycloak.operator.resources.limits.cpu | string | `"2"` |  |
 | keycloak.operator.resources.limits.memory | string | `"2Gi"` |  |

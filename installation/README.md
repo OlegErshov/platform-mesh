@@ -32,13 +32,13 @@ Platform Mesh requires the following cluster components at the listed versions:
 |---|---|
 | Flux | 2.17.2 |
 | OCM controller (ocm-k8s-toolkit) | 0.13.0 |
-| cert-manager | v1.20.1 |
+| cert-manager | v1.20.5 |
 | Gateway API CRDs | 1.5.1 |
-| Traefik | 41.4.0 |
+| Traefik | 42.1.3 |
 | Traefik CRDs | 1.14.0 |
 | CloudNativePG | 0.28.0 |
 | Keycloak operator | 0.10.0 |
-| etcd-druid | v0.36.4 |
+| etcd-druid | v0.39.1 |
 
 The `platform-mesh-prerequisites` chart installs all of the above at these exact
 versions and is the simplest way to satisfy this requirement. Any other
