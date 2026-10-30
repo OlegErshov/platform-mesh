@@ -486,8 +486,6 @@ data:
             extraEnvVars:
             - name: OPENFGA_EXPERIMENTALS
               value: enable-list-users
-            image:
-              tag: v1.11.2
             log:
               level: info
             migrate:
