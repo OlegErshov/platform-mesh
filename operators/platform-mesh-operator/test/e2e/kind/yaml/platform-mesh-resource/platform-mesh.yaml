@@ -22,7 +22,7 @@ spec:
     port: 8443
     baseDomain: "portal.localhost"
     protocol: "https"
-    gatewayServiceClusterIP: "10.96.188.4"
+    traefikClusterIP: "10.96.188.4"
     kcpFrontProxyClusterIP: "10.96.0.100"
   ocm:
     repo:

@@ -76,7 +76,7 @@ data:
               experimentalChannel: true
           service:
             spec:
-              clusterIP: "{{ .gatewayServiceClusterIP }}"
+              clusterIP: "{{ .traefikClusterIP }}"
             type: NodePort
       etcdDruid:
         enabled: true
@@ -123,7 +123,7 @@ data:
               enabled: true
     components:
       hostAliasesEntries: &hostAliasesEntries
-        - ip: "{{ .gatewayServiceClusterIP }}"
+        - ip: "{{ .traefikClusterIP }}"
           hostnames:
             - "{{ .baseDomain }}"
             - "kcp.api.{{ .baseDomain }}"
@@ -456,7 +456,7 @@ data:
             hostAliases:
               enabled: true
               entries:
-                - ip: "{{ .gatewayServiceClusterIP }}"
+                - ip: "{{ .traefikClusterIP }}"
                   hostnames:
                     - "kcp.api.{{ .baseDomain }}"
         kcp:

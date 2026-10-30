@@ -483,7 +483,7 @@ func (p exposureParams) templateVars(kcp config.KCPConfig) map[string]any {
 		"baseDomainPort":         p.baseDomainPort,
 		"port":                   p.portString(),
 		"protocol":               p.protocol,
-		"gatewayServiceClusterIP": p.traefikClusterIP,
+		"traefikClusterIP":       p.traefikClusterIP,
 		"kcpFrontProxyClusterIP": p.kcpFrontProxyClusterIP,
 		"internalFrontProxyUrl":  p.internalFrontProxyURL(kcp),
 	}
