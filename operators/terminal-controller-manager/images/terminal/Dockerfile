@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Build stage for k9s (nexus49 fork with kcp support)
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS k9s-builder
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS k9s-builder
 
 ARG TARGETOS
 ARG TARGETARCH
