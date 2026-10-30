@@ -49,7 +49,7 @@ spec:
     baseDomain: example.com          # Base domain for exposure (default: portal.localhost)
     port: 443                        # Port to expose services on (default: 8443)
     protocol: https                  # Protocol, http or https (default: https)
-    gatewayServiceClusterIP: 10.96.188.4  # In-cluster ClusterIP of the gateway 
+    traefikClusterIP: 10.96.188.4    # In-cluster IP of the Traefik gateway service (default: 10.96.188.4)
     kcpFrontProxyClusterIP: 10.96.0.100  # In-cluster IP of the KCP front-proxy service (default: 10.96.0.100)
 ```
 
@@ -58,8 +58,7 @@ spec:
 | `baseDomain` | string | `portal.localhost` | Base domain the platform is served on. |
 | `port` | int | `8443` | External port. Standard ports 80/443 are omitted from `baseDomainPort`. |
 | `protocol` | string | `https` | URL scheme used for externally exposed services. |
-| `gatewayServiceClusterIP` | string | `10.96.188.4` | ClusterIP of the gateway (Traefik) `Service`, injected into profiles that pin it (e.g. `service.clusterIP`, `hostAliases`). |
-| `traefikClusterIP` | string | `10.96.188.4` | **Deprecated** — use `gatewayServiceClusterIP`. Still honored when `gatewayServiceClusterIP` is unset; will be removed in a future. |
+| `traefikClusterIP` | string | `10.96.188.4` | ClusterIP of the Traefik gateway `Service`, injected into profiles that pin it (e.g. `service.clusterIP`, `hostAliases`). |
 | `kcpFrontProxyClusterIP` | string | `10.96.0.100` | ClusterIP of the KCP front-proxy `Service`, injected where profiles reference it. |
 
 These values are the single source of truth for the exposure-derived template variables (see [Template Variables](#template-variables)); the operator computes the derived vars (`baseDomainPort`, `baseDomainWithPort`, `internalFrontProxyUrl`) from them.
@@ -422,7 +421,7 @@ gotemplates/
 | `baseDomainWithPort` | `baseDomain` with `:port` suffix (omitted only for port 443) |
 | `port` | From `spec.exposure.port` |
 | `protocol` | From `spec.exposure.protocol` |
-| `gatewayServiceClusterIP` | From `spec.exposure.gatewayServiceClusterIP` (falls back to the deprecated `spec.exposure.traefikClusterIP`) |
+| `gatewayServiceClusterIP` | From `spec.exposure.traefikClusterIP` |
 | `kcpFrontProxyClusterIP` | From `spec.exposure.kcpFrontProxyClusterIP` |
 | `internalFrontProxyUrl` | In-cluster KCP front-proxy URL, derived from operator KCP config |
 

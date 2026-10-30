@@ -97,10 +97,6 @@ spec:
                 properties:
                   baseDomain:
                     type: string
-                  gatewayServiceClusterIP:
-                    description: GatewayServiceClusterIP is the in-cluster ClusterIP
-                      of the gateway Service
-                    type: string
                   kcpFrontProxyClusterIP:
                     type: string
                   port:
@@ -108,9 +104,6 @@ spec:
                   protocol:
                     type: string
                   traefikClusterIP:
-                    description: |-
-                      TraefikClusterIP is deprecated: use GatewayServiceClusterIP instead. It is still
-                      honored when GatewayServiceClusterIP is empty and will be removed in a future.
                     type: string
                 type: object
               featureToggles:
