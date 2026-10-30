@@ -416,6 +416,7 @@ data:
               hostnames:
               - "{{ .baseDomain }}"
               - "*.{{ .baseDomain }}"
+        iam-service:
           imageResources:
           - annotations:
               repo: oci
@@ -423,14 +424,13 @@ data:
               for: iam-service
           syncWave: 4
           enabled: true
+          dependsOn: []
           values:
-            caSecret: domain-certificate-ca
-            keycloak:
-              baseUrl: "https://{{ .baseDomainPort }}/keycloak"
+            caSecret: domain-certificate
             extraArgs:
             - --no-json
-            cors:
-              enabled: true
+            keycloak:
+              baseUrl: "https://{{ .baseDomainPort }}/keycloak"
             hostAliases:
               enabled: true
               entries: *hostAliasesEntries
@@ -446,7 +446,7 @@ data:
             absoluteReferencePath:
             - name: init-agent
           syncWave: 4
-          enabled: true
+          enabled: false
           values:
             configWorkspace: root:platform-mesh-system
             kcpKubeconfig: init-agent-kubeconfig
