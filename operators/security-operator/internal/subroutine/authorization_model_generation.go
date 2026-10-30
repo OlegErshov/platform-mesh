@@ -81,17 +81,17 @@ var modelTpl = template.Must(template.New("model").Parse(`module {{ .Name }}
 {{ if eq .Scope "Cluster" }}
 extend type core_platform-mesh_io_account
 	relations
-		define create_{{ .Group }}_{{ .Name }}: owner
-		define list_{{ .Group }}_{{ .Name }}: member
-		define watch_{{ .Group }}_{{ .Name }}: member
+		define create_{{ .Group }}_{{ .Name }}: {{ or .Create "owner" }}
+		define list_{{ .Group }}_{{ .Name }}: {{ or .List "member" }}
+		define watch_{{ .Group }}_{{ .Name }}: {{ or .Watch "member" }}
 {{ end }}
 
 {{ if eq .Scope "Namespaced" }}
 extend type core_namespace
 	relations
-		define create_{{ .Group }}_{{ .Name }}: owner
-		define list_{{ .Group }}_{{ .Name }}: member
-		define watch_{{ .Group }}_{{ .Name }}: member
+		define create_{{ .Group }}_{{ .Name }}: {{ or .Create "owner" }}
+		define list_{{ .Group }}_{{ .Name }}: {{ or .List "member" }}
+		define watch_{{ .Group }}_{{ .Name }}: {{ or .Watch "member" }}
 {{ end }}
 
 type {{ .Group }}_{{ .Singular }}
@@ -104,7 +104,7 @@ type {{ .Group }}_{{ .Singular }}
 		define update: {{ or .Update "member" }}
 		define delete: {{ or .Delete "member" }}
 		define patch: {{ or .Patch "member" }}
-		define watch: {{ or .Watch "member" }}
+		define watch: {{ if .Watch }}watch_{{ .Group }}_{{ .Name }} from parent{{ else }}member{{ end }}
 {{ range .Roles }}
 		define {{ .ID }}: {{ .Definition }}
 {{ end }}
@@ -123,7 +123,9 @@ type modelInput struct {
 	Singular string
 	Scope    string
 
+	Create string
 	Get    string
+	List   string
 	Update string
 	Delete string
 	Patch  string
@@ -361,7 +363,9 @@ func (a *AuthorizationModelGenerationSubroutine) Process(ctx context.Context, ob
 
 		if providerPermissions != nil {
 			if resourcePerms, ok := providerPermissions.Spec.Permissions[permissionKey]; ok {
+				input.Create = resourcePerms.DefaultPermissions.Create
 				input.Get = resourcePerms.DefaultPermissions.Get
+				input.List = resourcePerms.DefaultPermissions.List
 				input.Update = resourcePerms.DefaultPermissions.Update
 				input.Delete = resourcePerms.DefaultPermissions.Delete
 				input.Patch = resourcePerms.DefaultPermissions.Patch
