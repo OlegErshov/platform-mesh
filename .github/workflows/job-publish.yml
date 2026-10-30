@@ -258,7 +258,6 @@ jobs:
       - name: Install helm (pinned in tools/Taskfile.yaml)
         run: |
           echo "HELM=$(UGET_PRINT_PATH=absolute task tools:helm)" >> "$GITHUB_ENV"
-          pip3 install --quiet pyyaml # copy-etcd-druid.sh
       - name: Registry credentials
         run: |
           set -euo pipefail
