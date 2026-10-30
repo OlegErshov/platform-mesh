@@ -16,7 +16,7 @@ hack/update-keycloak-crds.sh <version>
 Example:
 
 ```bash
-hack/update-keycloak-crds.sh 26.7.2
+hack/update-keycloak-crds.sh 26.8.1
 ```
 
 This fetches the CRD manifests from the [OperatorHub community-operators](https://github.com/k8s-operatorhub/community-operators) repository and writes them to `charts/keycloak-operator/crds/`.
@@ -41,11 +41,11 @@ This fetches the CRD manifests from the [OperatorHub community-operators](https:
 | image.digest | string | `""` | The image digest (when set, overrides tag: registry/repository@digest) |
 | image.registry | string | `"quay.io"` | The image registry |
 | image.repository | string | `"keycloak/keycloak-operator"` | The image repository path (without registry) |
-| image.tag | string | `"26.7.2"` | The image tag (defaults to appVersion) |
-| keycloakImage.digest | string | `"sha256:5feb71bdf548ee2f7ff33ba2eba082a94de5c16d1a50de8bca71ab78a89c986b"` | The Keycloak image digest (when set, overrides tag: registry/repository@digest) |
+| image.tag | string | `"26.8.1"` | The image tag (defaults to appVersion) |
+| keycloakImage.digest | string | `""` | The Keycloak image digest (when set, overrides tag: registry/repository@digest) |
 | keycloakImage.registry | string | `"ghcr.io"` | The Keycloak image registry |
 | keycloakImage.repository | string | `"platform-mesh/custom-images/keycloak"` | The Keycloak image repository path (without registry). |
-| keycloakImage.tag | string | `"v26.7.2"` | The Keycloak image tag (defaults to appVersion) |
+| keycloakImage.tag | string | `"v26.8.1"` | The Keycloak image tag (defaults to appVersion) |
 | watchNamespaces | string | `""` | Namespace to watch for Keycloak CRs. Defaults to the release namespace. |
 
 ## Overriding Values
