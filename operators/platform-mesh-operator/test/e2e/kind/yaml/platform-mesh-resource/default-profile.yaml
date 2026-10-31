@@ -76,7 +76,7 @@ data:
               experimentalChannel: true
           service:
             spec:
-              clusterIP: "{{ .traefikClusterIP }}"
+              clusterIP: "{{ .gatewayServiceClusterIP }}"
             type: NodePort
       etcdDruid:
         enabled: true
@@ -289,7 +289,7 @@ data:
             hostAliases:
               enabled: true
               entries:
-              - ip: "{{ .traefikClusterIP }}"
+              - ip: "{{ .gatewayServiceClusterIP }}"
                 hostnames:
                 - "localhost"
                 - "portal.localhost"
@@ -297,10 +297,6 @@ data:
                 - "root.kcp.localhost"
                 - "nereus.kcp.localhost"
                 - "triton.kcp.localhost"
-              # kcp.localhost is the front-proxy itself, the shard hostnames stay on traefik
-              - ip: "{{ .kcpFrontProxyClusterIP }}"
-                hostnames:
-                - "kcp.localhost"
             keycloak:
               enabled: true
               operator:
@@ -342,7 +338,6 @@ data:
                 serviceAccount:
                   enabled: true
               frontProxy:
-                clusterIP: "{{ .kcpFrontProxyClusterIP }}"
                 port: 8443
               image:
                 tag: v0.33.1
@@ -417,7 +412,7 @@ data:
             hostAliases:
               enabled: true
               values:
-                - ip: "{{ .traefikClusterIP }}"
+                - ip: "{{ .gatewayServiceClusterIP }}"
                   hostnames:
                     - "localhost"
                     - "kcp.api.{{ .baseDomain }}"
@@ -658,7 +653,7 @@ data:
             hostAliases:
               enabled: true
               entries:
-              - ip: "{{ .traefikClusterIP }}"
+              - ip: "{{ .gatewayServiceClusterIP }}"
                 hostnames:
                 - "localhost"
                 - "portal.localhost"
@@ -666,10 +661,6 @@ data:
                 - "root.kcp.localhost"
                 - "nereus.kcp.localhost"
                 - "triton.kcp.localhost"
-              # kcp.localhost is the front-proxy itself, the shard hostnames stay on traefik
-              - ip: "{{ .kcpFrontProxyClusterIP }}"
-                hostnames:
-                - "kcp.localhost"
             http:
               protocol: https
             kcp:
